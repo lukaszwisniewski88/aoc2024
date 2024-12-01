@@ -8,14 +8,16 @@ import (
 	"strings"
 )
 
-func getInputLines(path string) ([][]int, error) {
+func OpenFile(path string) (*bufio.Scanner, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	return bufio.NewScanner(file), nil
+}
+
+func GetInputLines(scanner *bufio.Scanner) ([][]int, error) {
 	var result = make([][]int, 0)
-	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		splitted := strings.Fields(line)
@@ -33,7 +35,11 @@ func getInputLines(path string) ([][]int, error) {
 }
 
 func ProcessDayOne(path string) (string, error) {
-	input, err := getInputLines(path)
+	scanner, err := OpenFile(path)
+	if err != nil {
+		return "", err
+	}
+	input, err := GetInputLines(scanner)
 	if err != nil {
 		return "", err
 	}
