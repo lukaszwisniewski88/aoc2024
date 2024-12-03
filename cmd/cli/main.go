@@ -6,6 +6,7 @@ import (
 	"log"
 	"lukaszwisniewski88/aoc2024/first"
 	"lukaszwisniewski88/aoc2024/second"
+	"lukaszwisniewski88/aoc2024/third"
 	"os"
 
 	"github.com/urfave/cli/v3"
@@ -34,6 +35,20 @@ func main() {
 				Usage:   "Second day of Advent of Code, supply the input file path",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					sum, err := second.ProcessDayTwo(c.Args().First())
+					if err != nil {
+						return err
+					}
+					fmt.Println(sum)
+
+					return nil
+				},
+			},
+			{
+				Name:    "third",
+				Aliases: []string{"3"},
+				Usage:   "third day of Advent of Code, supply the input file path",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					sum, err := third.ProcessDayThree(c.Args().First())
 					if err != nil {
 						return err
 					}
