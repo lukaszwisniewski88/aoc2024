@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"lukaszwisniewski88/aoc2024/first"
+	"lukaszwisniewski88/aoc2024/fourth"
 	"lukaszwisniewski88/aoc2024/second"
 	"lukaszwisniewski88/aoc2024/third"
 	"os"
@@ -49,6 +50,20 @@ func main() {
 				Usage:   "third day of Advent of Code, supply the input file path",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					sum, err := third.ProcessDayThree(c.Args().First())
+					if err != nil {
+						return err
+					}
+					fmt.Println(sum)
+
+					return nil
+				},
+			},
+			{
+				Name:    "fourth",
+				Aliases: []string{"4"},
+				Usage:   "fourth day of Advent of Code, supply the input file path",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					sum, err := fourth.ProcessDayFour(c.Args().First())
 					if err != nil {
 						return err
 					}
