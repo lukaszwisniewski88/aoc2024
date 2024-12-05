@@ -53,6 +53,58 @@ func (s *Searcher) hasSequence(x, y int, v Vec2) bool {
 	return true
 }
 
+func (s *Searcher) hasCrossSequence(x, y int) bool {
+	// if first letter is not the same then return false
+	// vector to sequence of positions
+	center_letter := "A"
+	// only if the letter is the center letter we can continue
+	actual_letter, err := s.GetChar(x, y)
+	if err != nil {
+		return false
+	}
+	if actual_letter != rune(center_letter[0]) {
+		return false
+	}
+	all_vectors := []Vec2{
+		{1, 1},
+		{-1, -1},
+		{1, -1},
+		{-1, 1},
+	}
+	// filter out impossible vectors
+	possible_vectors := make([]Vec2, 0)
+	for _, vec := range all_vectors {
+		if x+vec.x >= 0 && x+vec.x < len(s.matrix[y]) && y+vec.y >= 0 && y+vec.y < len(s.matrix) {
+			possible_vectors = append(possible_vectors, vec)
+		}
+	}
+	if len(possible_vectors) != len(all_vectors) {
+		return false
+	}
+	// check if the sequence is correct
+	for i := 0; i < 2; i++ {
+		actual_vector := possible_vectors[i*2]
+		opposite_vector := Vec2{actual_vector.x * -1, actual_vector.y * -1}
+
+		actual_vector_char, err := s.GetChar(x+actual_vector.x, y+actual_vector.y)
+		if err != nil {
+			return false
+		}
+		opposite_vector_char, err := s.GetChar(x+opposite_vector.x, y+opposite_vector.y)
+		if err != nil {
+			return false
+		}
+		if actual_vector_char == opposite_vector_char {
+			return false
+		}
+		if !(actual_vector_char == rune("M"[0]) || actual_vector_char == rune("S"[0])) || !(opposite_vector_char == rune("M"[0]) || opposite_vector_char == rune("S"[0])) {
+			return false
+		}
+
+	}
+	return true
+}
+
 func (s *Searcher) getPossibleVectors(x, y, max_x, max_y int) []Vec2 {
 	// get the length of the sequence
 	sequence_len := len(s.sequence) - 1
@@ -83,15 +135,6 @@ func (s *Searcher) getPossibleVectors(x, y, max_x, max_y int) []Vec2 {
 	if x-sequence_len >= 0 && y+sequence_len < max_y {
 		vectors = append(vectors, Vec2{-sequence_len, sequence_len})
 	}
-	// remove the excluded vectors
-	// if excluded_vector, ok := s.excluded[fmt.Sprintf("%d,%d", x, y)]; ok {
-	// 	// filter out the excluded vector
-	// 	for i, vector := range vectors {
-	// 		if vector == excluded_vector {
-	// 			vectors = append(vectors[:i], vectors[i+1:]...)
-	// 		}
-	// 	}
-	// }
 
 	return vectors
 }
@@ -112,12 +155,24 @@ func (s *Searcher) Search() (count int) {
 			for _, vector := range vectors {
 				if s.hasSequence(x, y, vector) {
 					count++
-					fmt.Println("Found sequence", s.sequence, "at", x, y, "with vector", vector)
 				}
 			}
 		}
 	}
 	return count
+}
+
+func (s *Searcher) CrossSearch() (count int) {
+	for y, row := range s.matrix {
+		for x := range row {
+			// we will have allways the same cross vectors
+			if s.hasCrossSequence(x, y) {
+				count++
+
+			}
+		}
+	}
+	return
 }
 
 func ProcessDayFour(input_path string) (string, error) {
@@ -133,5 +188,5 @@ func ProcessDayFour(input_path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%d", searcher.Search()), nil
+	return fmt.Sprintf("%d \n %d", searcher.Search(), searcher.CrossSearch()), nil
 }

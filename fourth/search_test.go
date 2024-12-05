@@ -28,4 +28,15 @@ func TestSearchFourth(t *testing.T) {
 			t.Error("Expected", expected, "got", got)
 		}
 	})
+	t.Run("Count MAS crossed", func(t *testing.T) {
+		expected := 9
+		searcher, err := NewSearcher(input, "MAS")
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := searcher.CrossSearch()
+		if got != expected {
+			t.Error("Expected", expected, "got", got)
+		}
+	})
 }
