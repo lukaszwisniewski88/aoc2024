@@ -1,6 +1,8 @@
 package fifth
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Rule struct {
 	Before int
@@ -85,4 +87,54 @@ func (s *RuleSet) IsUpdateValid(line []int) bool {
 		}
 	}
 	return true
+}
+func indexOf(element int, data []int) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
+}
+func (s *RuleSet) CanBeBefore(number int, beforeSlice []int) (bool, int) {
+	for _, after := range beforeSlice {
+		if !s.canBeAfter(number, after) {
+			return false, after
+		}
+	}
+	return true, -1
+}
+func (s *RuleSet) CanBeAfter(number int, beforeSlice []int) (bool, int) {
+	for _, before := range beforeSlice {
+		if !s.canBeBefore(number, before) {
+			return false, before
+		}
+	}
+	return true, -1
+}
+
+func (s *RuleSet) CorrectUpdate(line []int) []int {
+	for !s.IsUpdateValid(line) {
+		for i, key := range line {
+			after_slice := line[i+1:]
+			before_slice := line[:i]
+			if len(after_slice) > 0 {
+				can_be_after, before := s.CanBeAfter(key, after_slice)
+				if !can_be_after {
+					index := indexOf(before, line)
+					line[i], line[index] = line[index], line[i]
+
+				}
+			}
+			if len(before_slice) > 0 {
+				can_be_before, after := s.CanBeBefore(key, before_slice)
+				if !can_be_before {
+					index := indexOf(after, line)
+					line[i], line[index] = line[index], line[i]
+				}
+			}
+		}
+	}
+
+	return line
 }

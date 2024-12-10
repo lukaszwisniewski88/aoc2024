@@ -23,6 +23,7 @@ func ProcessDayFive(input string) (string, error) {
 	rules := splitted[0]
 	updates := splitted[1]
 	valid_lines := make([][]int, 0)
+	invalid_lines := make([][]int, 0)
 	ruleSet := NewRuleSet(strings.Split(rules, "\n"))
 	updates_list := strings.Split(updates, "\n")
 	for _, update := range updates_list {
@@ -36,10 +37,17 @@ func ProcessDayFive(input string) (string, error) {
 		}
 		if ruleSet.IsUpdateValid(update_int) {
 			valid_lines = append(valid_lines, update_int)
+		} else {
+			invalid_lines = append(invalid_lines, update_int)
 		}
 	}
 	count := SumMiddleElements(valid_lines)
-	return fmt.Sprintf("%d", count), nil
+	corrected_lines := make([][]int, len(invalid_lines))
+	for i, line := range invalid_lines {
+		corrected_lines[i] = ruleSet.CorrectUpdate(line)
+	}
+	count_corrected := SumMiddleElements(corrected_lines)
+	return fmt.Sprintf("%d, %d", count, count_corrected), nil
 }
 
 func SumMiddleElements(lines [][]int) int {
